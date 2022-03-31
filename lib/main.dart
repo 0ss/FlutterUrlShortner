@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,18 +10,23 @@ void main() {
   runApp(const MyApp());
 }
 
+String generateRandomString(int len) {
+  var r = Random();
+  const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+}
+
 Future<String> shortUrl(String url) async {
-  String shortedUrl = "";
+  String hash = generateRandomString(5);
+  final endPoint = Uri.parse("https://v.ht/processreq.php");
+
   try {
-    final endPoint = Uri.http("lnkiy.com", "/createShortLink");
-    final res = await http.post(
-      endPoint,
-      headers: {'Content-type': 'application/x-www-form-urlencoded'},
-      body: {'link': url},
-    );
-    shortedUrl = res.body.split("u")[0];
+    await http.post(endPoint,
+        headers: {'Content-type': 'application/x-www-form-urlencoded'},
+        body: {'txt_url': url, 'txt_name': hash});
   } catch (e) {}
-  return shortedUrl;
+  return '${endPoint.host}/$hash';
 }
 
 class MyApp extends StatelessWidget {
